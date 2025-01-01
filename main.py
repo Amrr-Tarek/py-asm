@@ -79,8 +79,13 @@ def first_pass(file) -> dict[int, str]:  # remember to output a binary or hex fo
 
 
 def read_inst(words) -> str:
+    suffix = 0
     if words[0] in mri:
-        return mri[words[0]] + f"{bin(int(sym_table[words[1]]))[2:]:>012}"
+        try:
+            if words[2] == "I":
+                suffix = 8
+        finally:
+            return mri[words[0]] + f"{bin(int(sym_table[words[1]]) + suffix)[2:]:>012}"
 
     if words[0] in non_mri:
         return str_to_bin(non_mri[words[0]], 16)
