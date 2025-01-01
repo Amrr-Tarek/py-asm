@@ -22,10 +22,15 @@ python .\main.py asm-instr.txt -h
 
 #### 1. **First Pass**: The program scans he file to build a **symbol address table** for all labels defined in the assembly code.
 #### 2. **Second Pass**: The program processes instructions, translates them to machine code, and applies the selected output format.
-
+---
 ### Libraries Used
 - **sys:** For managing command-line arguments
 - **os:** For getting file name for error handling
+- **prettytable:** For pretty-printing the symbolic table. To install, use:
+
+	```bash
+	pip install prettytable
+	```
 
 ### Helper files
 - `helpers.py`: Contains the instruction table necessary to translate the code.
@@ -58,3 +63,6 @@ DIF,	HEX	0	/Result
 0108	0000
 
 ```
+
+## Suggested Improvements
+- Using python to run the code. Outputs the variables latest state or sth.
