@@ -73,8 +73,23 @@ def read_label(sym_table, words):
         inst = str_to_bin(words[2], 16)
     else:
         inst = read_inst(words[1:], sym_table)
-    
+
     return inst
+
+
+def read_inst(words: list, table: dict) -> str:
+    """
+    Reads and parses an instruction line, returning its binary representation
+    """
+    if words[0] in mri:
+        suffix = 8 if len(words) > 2 and words[2] == "I" else 0
+        return mri[words[0]] + f"{bin(int(table[words[1]]) + suffix)[2:]:>012}"
+
+    if words[0] in non_mri:
+        return str_to_bin(non_mri[words[0]], 16)
+
+    else:
+        raise SyntaxError()
 
 
 def cnvrt(lst: list, flag: str) -> list:
@@ -92,6 +107,13 @@ def cnvrt(lst: list, flag: str) -> list:
             res = hex(int(i[:-1], base=2))[2:].upper()
         out.append(res + suffix)
     return out
+
+
+def str_to_bin(txt: str, base=10) -> str:
+    """
+    Converts numbers to binary
+    """
+    return f"{bin(0xFFFF & int(str(txt), base=base))[2:]:>016}"
 
 
 def first_pass(file: str) -> dict[int, str]:
@@ -121,28 +143,6 @@ def first_pass(file: str) -> dict[int, str]:
             LC += 1
 
     return table
-
-
-def read_inst(words: list, table: dict) -> str:
-    """
-    Reads and parses an instruction line, returning its binary representation
-    """
-    if words[0] in mri:
-        suffix = 8 if len(words) > 2 and words[2] == "I" else 0
-        return mri[words[0]] + f"{bin(int(table[words[1]]) + suffix)[2:]:>012}"
-
-    if words[0] in non_mri:
-        return str_to_bin(non_mri[words[0]], 16)
-
-    else:
-        raise SyntaxError()
-
-
-def str_to_bin(txt: str, base=10) -> str:
-    """
-    Converts numbers to binary
-    """
-    return f"{bin(0xFFFF & int(str(txt), base=base))[2:]:>016}"
 
 
 def waitExit(msg: str, code: int) -> None:

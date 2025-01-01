@@ -1,5 +1,3 @@
-pseudo = {'ORG', 'HEX', 'END'}
-
 mri = {
     'AND': '0000',
     'ADD': '0001',
