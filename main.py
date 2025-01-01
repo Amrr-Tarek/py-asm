@@ -34,22 +34,30 @@ def process_file(file_path: str, flag: str, sym_table: dict[str, int]) -> None:
     """
     Performs the second pass, processes the input file, outputs the result in output.txt in the same directory
     """
-    LC = 0
+    LC = 0x0
     out_lines = []
     with open(file_path) as file:
         ln = 0
         for line in file:  # reads a line
             ln += 1
             words = line.upper().split()
+            if not words:
+                continue
             if words[0] == "END":
                 break
 
             elif words[0] == "ORG":
-                LC = int(words[1])
+                LC = int(words[1], base=16)
 
                 out_lines = out_lines[:-1]
-                out_lines.append(f"{bin(int(str(LC), base=16))[2:]:>012}" + "\t")
+                out_lines.append(f"{bin(LC)[2:]:>012}" + "\t")
                 continue
+
+            elif words[0] == "DEC":
+                inst = str_to_bin(words[1])
+
+            elif words[0] == "HEX":
+                inst = str_to_bin(words[1], 16)
 
             elif words[0].endswith(","):  # if label
                 inst = read_label(sym_table, words, ln)
@@ -59,7 +67,7 @@ def process_file(file_path: str, flag: str, sym_table: dict[str, int]) -> None:
 
             LC += 1
             out_lines.append(inst + "\n")
-            out_lines.append(f"{bin(int(str(LC), base=16))[2:]:>012}" + "\t")
+            out_lines.append(f"{bin(LC)[2:]:>012}" + "\t")
 
     with open("output.txt", "w") as output:
         out_lines = convert(out_lines, flag)
@@ -84,16 +92,22 @@ def read_inst(words: list, table: dict, line_number) -> str:
     try:
         if words[0] in mri:
             suffix = 8 if len(words) > 2 and words[2] == "I" else 0
-            return mri[words[0]] + f"{bin(int(str(table[words[1]]), base=16) + suffix)[2:]:>012}"
+            return (
+                mri[words[0]]
+                + f"{bin(int(str(table[words[1]]), base=16) + suffix)[2:]:>012}"
+            )
 
         if words[0] in non_mri:
             return str_to_bin(non_mri[words[0]], 16)
-    
+
     except Exception as e:
         waitExit(f"Invalid Syntax on line {line_number}.\nError: {e}", 4)
-        
+
     else:
-        waitExit(f"Invalid Syntax on line {line_number}.\nInvalid Instruction '{words[0]}'", 5)
+        waitExit(
+            f"Invalid Syntax on line {line_number}.\nInvalid Instruction '{words[0]}'",
+            5,
+        )
 
 
 def convert(lst: list, flag: str) -> list:
@@ -126,23 +140,28 @@ def first_pass(file: str) -> dict[int, str]:
     Returns the symbol address table for the labels
     """
     table = {}
-    LC = 0
+    LC = 0x0
     with open(file, "r") as f:
         lc = 0
         for line in f:  # reads a line
             lc += 1
             words = line.upper().split()
+            if not words:
+                continue
             if words[0] == "ORG":
                 try:
-                    LC = int(words[1])
+                    LC = int(words[1], 16)
                 except ValueError:
                     waitExit(f"Invalid Syntax on line {lc}. => '{words[1]}'", 3)
                 continue
 
             elif words[0].endswith(","):  # if a label
                 if len(words[0]) > 4:
-                    waitExit(f"Invalid label length at line: {lc}!\nOnly 3 characters long labels are allowed", 6)
-                table[words[0][:-1]] = LC
+                    waitExit(
+                        f"Invalid label length at line: {lc}!\nOnly 3 characters long labels are allowed",
+                        6,
+                    )
+                table[words[0][:-1]] = hex(LC)[2:].upper()
 
             elif words[0] == "END":
                 return table
