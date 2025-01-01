@@ -23,10 +23,10 @@ def main() -> None:
             elif arg == "-st":
                 show_sym_table = True
             else:
-                waitExit(f"Invalid flag. {usage_msg}", 1)
+                Exit(f"Invalid flag. {usage_msg}", 1)
 
     else:
-        waitExit(f"Invalid number of arguments. {usage_msg}", 2)
+        Exit(f"Invalid number of arguments. {usage_msg}", 2)
 
     try:
         sym_table = first_pass(args[1])
@@ -109,10 +109,10 @@ def read_inst(words: list, table: dict, line_number) -> str:
             return str_to_bin(non_mri[words[0]], 16)
 
     except Exception as e:
-        waitExit(f"Invalid Syntax on line {line_number}.\nError: {e}", 4)
+        Exit(f"Invalid Syntax on line {line_number}.\nError: {e}", 4)
 
     else:
-        waitExit(
+        Exit(
             f"Invalid Syntax on line {line_number}.\nInvalid Instruction '{words[0]}'",
             5,
         )
@@ -160,12 +160,12 @@ def first_pass(file: str) -> dict[int, str]:
                 try:
                     LC = int(words[1], 16)
                 except ValueError:
-                    waitExit(f"Invalid Syntax on line {lc}. => '{words[1]}'", 3)
+                    Exit(f"Invalid Syntax on line {lc}. => '{words[1]}'", 3)
                 continue
 
             elif words[0].endswith(","):  # if a label
                 if len(words[0]) > 4:
-                    waitExit(
+                    Exit(
                         f"Invalid label length at line: {lc}!\nOnly 3 characters long labels are allowed",
                         6,
                     )
@@ -178,13 +178,11 @@ def first_pass(file: str) -> dict[int, str]:
     return table
 
 
-def waitExit(msg: str, code: int) -> None:
+def Exit(msg: str, code: int) -> None:
     """
     Prints an error message followed by waiting for user to press enter.
     """
     print(msg)
-    print("Press Enter to terminate..", end="")
-    input()
     exit(code)
 
 
