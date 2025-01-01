@@ -33,7 +33,7 @@ def main() -> None:
         print_sym_table(sym_table) if show_sym_table else None
 
     except FileNotFoundError:
-        print(f"'{args[1]}' Not Found!")
+        Exit(f"ERROR: File '{args[1]}' Not Found!", 7)
 
     process_file(args[1], flag, sym_table)
 
