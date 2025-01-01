@@ -4,13 +4,14 @@ This python program processes a text file containing basic computer assembly ins
 ## Usage
 To execute the program, simply use the following command:
 ```bash
-python <file_name> file.txt -flag
+python <file_name> file.txt [flags]
 ```
 where file.txt is the assembly file you want to process
 ### Flags
 - `-b`: Outputs machine code in **binary** (default).
 - `-h`: Outputs machine code in **hexadecimal**.
 - `-d`: Outputs machine code in **decimal**.
+- `-st`: Prints the Symbolic Table in the terminal in a pretty-formatted way.
 
 ### Example
 ```bash

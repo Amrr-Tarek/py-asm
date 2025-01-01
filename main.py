@@ -1,5 +1,6 @@
 import sys
 import os
+from prettytable import PrettyTable
 from helpers import *
 
 current_file = os.path.basename(__file__)
@@ -7,22 +8,29 @@ args = sys.argv
 
 
 def main() -> None:
-    usage_msg = f"""Usage: 'python .\\{current_file} file.txt -flag
+    usage_msg = f"""Usage: 'python .\\{current_file} file.txt [flags]
     Flags:
     -b: Outputs Machine code in binary
     -h: Outputs Machine code in hex
-    -d: Outputs Machine code in decimal"""
-    if 2 <= len(args) <= 3:
-        flag = args[2] if len(args) == 3 else "-b"
-        if flag not in {"-b", "-d", "-h"}:
-            waitExit(f"Invalid flag. {usage_msg}", 1)
-
+    -d: Outputs Machine code in decimal
+    -st: Prints the symbolic table in the terminal"""
+    if 2 <= len(args) <= 4:
+        flag = "-b"
+        show_sym_table = False
+        for arg in args[2:]:
+            if arg in {"-b", "-d", "-h"}:
+                flag = arg
+            elif arg == "-st":
+                show_sym_table = True
+            else:
+                waitExit(f"Invalid flag. {usage_msg}", 1)
+            
     else:
         waitExit(f"Invalid number of arguments. {usage_msg}", 2)
 
     try:
         sym_table = first_pass(args[1])
-        print(sym_table)
+        print_sym_table(sym_table) if show_sym_table else None
 
     except FileNotFoundError:
         print(f"'{args[1]}' Not Found!")
@@ -179,6 +187,15 @@ def waitExit(msg: str, code: int) -> None:
     input()
     exit(code)
 
+def print_sym_table(sym_table: dict) -> None:
+    table = PrettyTable()
+    table.field_names = ["Label", "Address (Hex)"]
+    
+    for label, address in sym_table.items():
+        table.add_row([label, address])
+    
+    print(table)
+    
 
 if __name__ == "__main__":
     main()
