@@ -9,8 +9,12 @@ args = sys.argv
 
 
 def main():
-    if len(args) != 2:
-        waitExit(f"Usage: 'python .\\{current_file.name} file.txt", 1)
+    if not 2 <= len(args) <= 3:
+        waitExit(
+            f"Usage: 'python .\\{current_file.name} file.txt -flag\nFlags:\n-b: Outputs Machine code in binary\n-h: Outputs Machine code in hex\n-d: Outputs Machine code in decimal",
+            1,
+        )
+    flag = args[2] if len(args) == 3 else "-b"
 
     try:
         global sym_table
@@ -32,6 +36,7 @@ def main():
 
                 elif words[0] == "ORG":
                     LC = int(words[1])
+                    out_lines = out_lines[:-1]
                     out_lines.append(f"{bin(LC)[2:]:>012}" + "\t")
                     ##################
                     continue
@@ -43,19 +48,30 @@ def main():
                         inst = str_to_bin(words[2], 16)
                     else:
                         inst = read_inst(words[1:])
-                    print(f"LC: {LC} INST: {inst}")
 
                 else:
                     inst = read_inst(words)
-                    print(f"LC: {LC} INST: {inst}")
 
                 LC += 1
                 out_lines.append(inst + "\n")
                 out_lines.append(f"{bin(LC)[2:]:>012}" + "\t")
 
         with open("output.txt", "w") as output:
+            out_lines = cnvrt(out_lines, flag)
             output.writelines(out_lines[:-1])
 
+
+def cnvrt(lst, flag):
+    if flag == "-b":
+        return lst
+    out = []
+    for i in lst:
+        suffix = i[-1:]
+        if flag == "-d":
+            out.append(str(int(i[:-1], base=2)) + suffix)
+        elif flag == "-h":
+            out.append(hex(int(i[:-1], base=2))[2:].upper() + suffix)
+    return out
 
 def first_pass(file) -> dict[int, str]:  # remember to output a binary or hex for debug
     table = {}
@@ -104,4 +120,3 @@ def waitExit(msg, code):
 
 if __name__ == "__main__":
     main()
-    stri = str_to_bin(-23, 10)
