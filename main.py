@@ -1,20 +1,19 @@
 import sys
 import os
-from pathlib import Path
 from helpers import *
 
-current_file = Path(__file__)
-
+current_file = os.path.basename(__file__)
 args = sys.argv
 
-
 def main():
-    if not 2 <= len(args) <= 3:
-        waitExit(
-            f"Usage: 'python .\\{current_file.name} file.txt -flag\nFlags:\n-b: Outputs Machine code in binary\n-h: Outputs Machine code in hex\n-d: Outputs Machine code in decimal",
-            1,
-        )
-    flag = args[2] if len(args) == 3 else "-b"
+    usage_msg = f"Usage: 'python .\\{current_file} file.txt -flag\nFlags:\n-b: Outputs Machine code in binary\n-h: Outputs Machine code in hex\n-d: Outputs Machine code in decimal"
+    if 2 <= len(args) <= 3:
+        flag = args[2] if len(args) == 3 else "-b"
+        if flag not in {"-b", "-d", "-h"}:
+            waitExit(f"Invalid flag. {usage_msg}", 1)
+
+    else:
+        waitExit(f"Invalid number of arguments. {usage_msg}", 1)
 
     try:
         global sym_table
@@ -72,6 +71,7 @@ def cnvrt(lst, flag):
         elif flag == "-h":
             out.append(hex(int(i[:-1], base=2))[2:].upper() + suffix)
     return out
+
 
 def first_pass(file) -> dict[int, str]:  # remember to output a binary or hex for debug
     table = {}
