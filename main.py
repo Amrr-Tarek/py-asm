@@ -52,7 +52,7 @@ def process_file(file_path: str, flag: str, sym_table: dict[str, int]) -> None:
                 continue
 
             elif words[0].endswith(","):  # if label
-                read_label(sym_table, words)
+                inst = read_label(sym_table, words)
 
             else:
                 inst = read_inst(words, sym_table)
@@ -73,6 +73,8 @@ def read_label(sym_table, words):
         inst = str_to_bin(words[2], 16)
     else:
         inst = read_inst(words[1:], sym_table)
+    
+    return inst
 
 
 def cnvrt(lst: list, flag: str) -> list:
@@ -126,11 +128,14 @@ def read_inst(words: list, table: dict) -> str:
     Reads and parses an instruction line, returning its binary representation
     """
     if words[0] in mri:
-        suffix = 8 if len(args) > 2 and words[2] == "I" else 0
+        suffix = 8 if len(words) > 2 and words[2] == "I" else 0
         return mri[words[0]] + f"{bin(int(table[words[1]]) + suffix)[2:]:>012}"
 
     if words[0] in non_mri:
         return str_to_bin(non_mri[words[0]], 16)
+
+    else:
+        raise SyntaxError()
 
 
 def str_to_bin(txt: str, base=10) -> str:
