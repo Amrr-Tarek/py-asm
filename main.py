@@ -24,7 +24,7 @@ def main() -> None:
                 show_sym_table = True
             else:
                 waitExit(f"Invalid flag. {usage_msg}", 1)
-            
+
     else:
         waitExit(f"Invalid number of arguments. {usage_msg}", 2)
 
@@ -101,8 +101,8 @@ def read_inst(words: list, table: dict, line_number) -> str:
         if words[0] in mri:
             suffix = 8 if len(words) > 2 and words[2] == "I" else 0
             return (
-                mri[words[0]]
-                + f"{bin(int(str(table[words[1]]), base=16) + suffix)[2:]:>012}"
+                f"{bin(int(mri[words[0]], base=2) + suffix)[2:]:>04}"
+                + f"{bin(int(str(table[words[1]]), base=16))[2:]:>012}"
             )
 
         if words[0] in non_mri:
@@ -187,15 +187,16 @@ def waitExit(msg: str, code: int) -> None:
     input()
     exit(code)
 
+
 def print_sym_table(sym_table: dict) -> None:
     table = PrettyTable()
     table.field_names = ["Label", "Address (Hex)"]
-    
+
     for label, address in sym_table.items():
         table.add_row([label, address])
-    
+
     print(table)
-    
+
 
 if __name__ == "__main__":
     main()
