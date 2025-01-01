@@ -32,13 +32,13 @@ def main():
 
                 elif words[0] == "ORG":
                     LC = int(words[1])
-                    out_lines.append(bin(LC) + "\t")
+                    out_lines.append(f"{bin(LC)[2:]:>012}" + "\t")
                     ##################
                     continue
 
                 elif words[0].endswith(","):  # if label
                     if words[1] == "DEC":
-                        inst = str_to_bin(words[2], 10)
+                        inst = str_to_bin(words[2])
                     elif words[1] == "HEX":
                         inst = str_to_bin(words[2], 16)
                     else:
@@ -50,6 +50,11 @@ def main():
                     print(f"LC: {LC} INST: {inst}")
 
                 LC += 1
+                out_lines.append(inst + "\n")
+                out_lines.append(f"{bin(LC)[2:]:>012}" + "\t")
+
+        with open("output.txt", "w") as output:
+            output.writelines(out_lines[:-1])
 
 
 def first_pass(file) -> dict[int, str]:  # remember to output a binary or hex for debug
@@ -81,7 +86,7 @@ def read_inst(words) -> str:
         return str_to_bin(non_mri[words[0]], 16)
 
 
-def str_to_bin(txt, base):
+def str_to_bin(txt, base=10):
     return f"{bin(0xFFFF & int(str(txt), base=base))[2:]:>016}"
 
 
