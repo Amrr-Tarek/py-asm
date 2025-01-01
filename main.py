@@ -22,7 +22,6 @@ def main() -> None:
 
     try:
         sym_table = first_pass(args[1])
-        print(sym_table)
 
     except FileNotFoundError:
         print(f"'{args[1]}' Not Found!")
@@ -37,9 +36,9 @@ def process_file(file_path: str, flag: str, sym_table: dict[str, int]) -> None:
     LC = 0
     out_lines = []
     with open(file_path) as file:
-        lc = 0
+        ln = 0
         for line in file:  # reads a line
-            lc += 1
+            ln += 1
             words = line.upper().split()
             if words[0] == "END":
                 break
@@ -52,10 +51,10 @@ def process_file(file_path: str, flag: str, sym_table: dict[str, int]) -> None:
                 continue
 
             elif words[0].endswith(","):  # if label
-                inst = read_label(sym_table, words)
+                inst = read_label(sym_table, words, ln)
 
             else:
-                inst = read_inst(words, sym_table)
+                inst = read_inst(words, sym_table, ln)
 
             LC += 1
             out_lines.append(inst + "\n")
@@ -66,30 +65,34 @@ def process_file(file_path: str, flag: str, sym_table: dict[str, int]) -> None:
         output.writelines(out_lines[:-1])
 
 
-def read_label(sym_table, words):
+def read_label(sym_table, words, ln):
     if words[1] == "DEC":
         inst = str_to_bin(words[2])
     elif words[1] == "HEX":
         inst = str_to_bin(words[2], 16)
     else:
-        inst = read_inst(words[1:], sym_table)
+        inst = read_inst(words[1:], sym_table, ln)
 
     return inst
 
 
-def read_inst(words: list, table: dict) -> str:
+def read_inst(words: list, table: dict, line_number) -> str:
     """
     Reads and parses an instruction line, returning its binary representation
     """
-    if words[0] in mri:
-        suffix = 8 if len(words) > 2 and words[2] == "I" else 0
-        return mri[words[0]] + f"{bin(int(table[words[1]]) + suffix)[2:]:>012}"
+    try:
+        if words[0] in mri:
+            suffix = 8 if len(words) > 2 and words[2] == "I" else 0
+            return mri[words[0]] + f"{bin(int(table[words[1]]) + suffix)[2:]:>012}"
 
-    if words[0] in non_mri:
-        return str_to_bin(non_mri[words[0]], 16)
-
+        if words[0] in non_mri:
+            return str_to_bin(non_mri[words[0]], 16)
+    
+    except Exception as e:
+        waitExit(f"Invalid Syntax on line {line_number}.\nError: {e}", 4)
+        
     else:
-        raise SyntaxError()
+        waitExit(f"Invalid Syntax on line {line_number}.\nInvalid Instruction '{words[0]}'", 5)
 
 
 def cnvrt(lst: list, flag: str) -> list:
@@ -132,10 +135,12 @@ def first_pass(file: str) -> dict[int, str]:
                 try:
                     LC = int(words[1])
                 except ValueError:
-                    waitExit(f"Invalid Syntax on line {lc}", 3)
+                    waitExit(f"Invalid Syntax on line {lc}. => '{words[1]}'", 3)
                 continue
 
             elif words[0].endswith(","):  # if a label
+                if len(words[0]) > 4:
+                    waitExit(f"Invalid label length at line: {lc}!\nOnly 3 characters long labels are allowed", 6)
                 table[words[0][:-1]] = LC
 
             elif words[0] == "END":
