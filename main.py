@@ -22,6 +22,7 @@ def main() -> None:
 
     try:
         sym_table = first_pass(args[1])
+        print(sym_table)
 
     except FileNotFoundError:
         print(f"'{args[1]}' Not Found!")
@@ -47,7 +48,7 @@ def process_file(file_path: str, flag: str, sym_table: dict[str, int]) -> None:
                 LC = int(words[1])
 
                 out_lines = out_lines[:-1]
-                out_lines.append(f"{bin(LC)[2:]:>012}" + "\t")
+                out_lines.append(f"{bin(int(str(LC), base=16))[2:]:>012}" + "\t")
                 continue
 
             elif words[0].endswith(","):  # if label
@@ -58,10 +59,10 @@ def process_file(file_path: str, flag: str, sym_table: dict[str, int]) -> None:
 
             LC += 1
             out_lines.append(inst + "\n")
-            out_lines.append(f"{bin(LC)[2:]:>012}" + "\t")
+            out_lines.append(f"{bin(int(str(LC), base=16))[2:]:>012}" + "\t")
 
     with open("output.txt", "w") as output:
-        out_lines = cnvrt(out_lines, flag)
+        out_lines = convert(out_lines, flag)
         output.writelines(out_lines[:-1])
 
 
@@ -83,7 +84,7 @@ def read_inst(words: list, table: dict, line_number) -> str:
     try:
         if words[0] in mri:
             suffix = 8 if len(words) > 2 and words[2] == "I" else 0
-            return mri[words[0]] + f"{bin(int(table[words[1]]) + suffix)[2:]:>012}"
+            return mri[words[0]] + f"{bin(int(str(table[words[1]]), base=16) + suffix)[2:]:>012}"
 
         if words[0] in non_mri:
             return str_to_bin(non_mri[words[0]], 16)
@@ -95,7 +96,7 @@ def read_inst(words: list, table: dict, line_number) -> str:
         waitExit(f"Invalid Syntax on line {line_number}.\nInvalid Instruction '{words[0]}'", 5)
 
 
-def cnvrt(lst: list, flag: str) -> list:
+def convert(lst: list, flag: str) -> list:
     """
     Converts the machine code to specific format (binary, decimal, hexdecimal). Controlled by the flag.
     """
@@ -107,7 +108,7 @@ def cnvrt(lst: list, flag: str) -> list:
         if flag == "-d":
             res = str(int(i[:-1], base=2))
         elif flag == "-h":
-            res = hex(int(i[:-1], base=2))[2:].upper()
+            res = f"{hex(int(i[:-1], base=2))[2:]:>04}".upper()
         out.append(res + suffix)
     return out
 
