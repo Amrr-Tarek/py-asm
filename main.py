@@ -100,7 +100,9 @@ def read_inst(words: list, table: dict, line_number) -> str:
     try:
         if words[0] in mri:
             suffix = 8 if len(words) > 2 and words[2] == "I" else 0
-            return str_to_bin(mri[words[0]], 2, 4) + str_to_bin(table[words[1]], 16, 12)
+            return f"{bin(int(mri[words[0]], base=2) + suffix)[2:]:>04}" + str_to_bin(
+                table[words[1]], 16, 12
+            )
 
         if words[0] in non_mri:
             return str_to_bin(non_mri[words[0]], 16)
@@ -127,9 +129,9 @@ def convert(lst: list[str], flag: str, size: int = 4) -> list:
         if flag == "-d":
             res = str(int(i[:-1], base=2))
         elif flag == "-h":
-            if suffix == '\t':
+            if suffix == "\t":
                 size = 3
-            elif suffix == '\n':
+            elif suffix == "\n":
                 size = 4
             res = hex(int(i[:-1], base=2))[2:].zfill(size).upper()
         out.append(res + suffix)
