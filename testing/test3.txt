@@ -1,0 +1,23 @@
+        ORG 100 /Origin of program is HEX 100
+        LDA ADS /Load first address of operands
+        STA PTR /Store in pointer
+        LDA NBR /Load minus 100
+        STA CTR /Store in counter
+        CLA     /Clear accumulator
+LOP,    ADD PTR I /Add an operand to AC
+        ISZ PTR /Increment pointer
+        ISZ CTR /Increment counter
+        BUN LOP /Repeat loop again
+        STA SUM /Store sum
+        HLT     /Halt
+ADS,    HEX 150 /First address of operands
+PTR,    HEX 0   /This location reserved for a pointer
+NBR,    DEC -100 /Constant to initialized counter
+CTR,    HEX 0   /This location reserved for a counter
+SUM,    HEX 0   /Sum is stored here
+        ORG 150 /Origin of operands is HEX 150
+        DEC 75  /First operand
+
+        ORG 1B3
+        DEC 23 /Last operand
+        END
