@@ -4,15 +4,18 @@ This python program processes a text file containing the *basic computer* assemb
 ## Usage
 To execute the program, simply use the following command:
 ```bash
-python <file_name> file.txt [flags]
+python <file_name> file.txt output.txt [flags]
 ```
-where file.txt is the assembly file you want to process
+Where:
+- `asm.txt` is the assembly file you want to process.
+- `output.txt` is the name which you want the output to be.
+
 ### Flags
 - `-b`: Outputs machine code in **binary** (default).
 - `-h`: Outputs machine code in **hexadecimal**.
 - `-d`: Outputs machine code in **decimal**.
 - `-st`: Prints the Symbolic Table in the terminal in a pretty-formatted way.
-
+---
 ### Example
 ```bash
 python .\main.py asm-instr.txt -h
