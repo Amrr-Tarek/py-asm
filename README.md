@@ -47,7 +47,7 @@ python .\main.py asm-instr.txt -h
 MIN,	DEC 83	/Minuend
 SUB,	DEC -23	/Subtrahend
 DIF,	HEX 0	/Result
-		END		/End of symbolic program
+	END	/End of symbolic program
 ```
 
 ## Example Ouput (using -h flag)
