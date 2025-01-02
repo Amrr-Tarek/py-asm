@@ -3,30 +3,33 @@ import os
 from prettytable import PrettyTable
 from helpers import *
 
-current_file = os.path.basename(__file__)
-args = sys.argv
 
-
-def main() -> None:
-    usage_msg = f"""Usage: 'python .\\{current_file} file.txt [flags]
+def main(args: list[str], current_file: str) -> None:
+    output_name = ""
+    usage_msg = f"""Usage: 'python .\\{current_file} asm.txt output.txt [flags]
     Flags:
     -b: Outputs Machine code in binary
     -h: Outputs Machine code in hex
     -d: Outputs Machine code in decimal
     -st: Prints the symbolic table in the terminal"""
-    if 2 <= len(args) <= 4:
-        flag = "-b"
-        show_sym_table = False
-        for arg in args[2:]:
-            if arg in {"-b", "-d", "-h"}:
-                flag = arg
-            elif arg == "-st":
-                show_sym_table = True
-            else:
-                Exit(f"Invalid flag. {usage_msg}", 1)
-
-    else:
+    if not 2 <= len(args) <= 5:
         Exit(f"Invalid number of arguments. {usage_msg}", 2)
+
+    flag = "-b"
+    show_sym_table = False
+    output_name = "output.txt"
+
+    if len(args) >= 3 and not args[2].startswith("-"):
+        output_name = args[2]
+        args = [args[0], args[1]] + args[3:]
+
+    for arg in args[2:]:
+        if arg in {"-b", "-d", "-h"}:
+            flag = arg
+        elif arg == "-st":
+            show_sym_table = True
+        else:
+            Exit(f"Invalid flag. {usage_msg}", 1)
 
     try:
         sym_table = first_pass(args[1])
@@ -35,7 +38,10 @@ def main() -> None:
     except FileNotFoundError:
         Exit(f"ERROR: File '{args[1]}' Not Found!", 7)
 
-    process_file(args[1], flag, sym_table)
+    out_lines = process_file(args[1], flag, sym_table)
+    with open(output_name, "w") as output:
+        out_lines = convert(out_lines, flag)
+        output.writelines(out_lines[:-1])
 
 
 def process_file(file_path: str, flag: str, sym_table: dict[str, int]) -> None:
@@ -77,9 +83,7 @@ def process_file(file_path: str, flag: str, sym_table: dict[str, int]) -> None:
             out_lines.append(inst + "\n")
             out_lines.append(f"{bin(LC)[2:]:>012}" + "\t")
 
-    with open("output.txt", "w") as output:
-        out_lines = convert(out_lines, flag)
-        output.writelines(out_lines[:-1])
+    return out_lines
 
 
 def read_label(sym_table, words, ln):
@@ -200,4 +204,6 @@ def print_sym_table(sym_table: dict) -> None:
 
 
 if __name__ == "__main__":
-    main()
+    current_file = os.path.basename(__file__)
+    args = sys.argv
+    main(args, current_file)
