@@ -55,8 +55,18 @@ def process_file(file_path: str, flag: str, sym_table: dict[str, int]) -> None:
         for line in file:  # reads a line
             ln += 1
             words = line.upper().split()
+            for i, word in enumerate(words):
+                if word.startswith("/"):
+                    words = words[:i]
+                    break
+
             if not words:
                 continue
+
+            if words[0].startswith("/"):
+                print(line)
+                print(words)
+
             if words[0] == "END":
                 break
 
@@ -70,7 +80,7 @@ def process_file(file_path: str, flag: str, sym_table: dict[str, int]) -> None:
             elif words[0].endswith(","):  # if label
                 inst = read_inst(words[1:], sym_table, ln)
 
-            else:
+            else:  # if normal instruction
                 inst = read_inst(words, sym_table, ln)
 
             LC += 1
@@ -150,8 +160,10 @@ def first_pass(file: str) -> dict[int, str]:
         for line in f:  # reads a line
             lc += 1
             words = line.upper().split()
-            if not words:
+
+            if not words or words[0].startswith("/"):
                 continue
+
             if words[0] == "ORG":
                 try:
                     LC = int(words[1], 16)
