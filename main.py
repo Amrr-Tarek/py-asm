@@ -100,10 +100,7 @@ def read_inst(words: list, table: dict, line_number) -> str:
     try:
         if words[0] in mri:
             suffix = 8 if len(words) > 2 and words[2] == "I" else 0
-            return (
-                f"{bin(int(mri[words[0]], base=2) + suffix)[2:]:>04}"
-                + f"{bin(int(str(table[words[1]]), base=16))[2:]:>012}"
-            )
+            return str_to_bin(mri[words[0]], 2, 4) + str_to_bin(table[words[1]], 16, 12)
 
         if words[0] in non_mri:
             return str_to_bin(non_mri[words[0]], 16)
@@ -118,7 +115,7 @@ def read_inst(words: list, table: dict, line_number) -> str:
         )
 
 
-def convert(lst: list, flag: str) -> list:
+def convert(lst: list[str], flag: str, size: int = 4) -> list:
     """
     Converts the machine code to specific format (binary, decimal, hexdecimal). Controlled by the flag.
     """
@@ -130,16 +127,20 @@ def convert(lst: list, flag: str) -> list:
         if flag == "-d":
             res = str(int(i[:-1], base=2))
         elif flag == "-h":
-            res = f"{hex(int(i[:-1], base=2))[2:]:>04}".upper()
+            if suffix == '\t':
+                size = 3
+            elif suffix == '\n':
+                size = 4
+            res = hex(int(i[:-1], base=2))[2:].zfill(size).upper()
         out.append(res + suffix)
     return out
 
 
-def str_to_bin(txt: str, base=10) -> str:
+def str_to_bin(txt: str, base=10, size: int = 16) -> str:
     """
     Converts numbers to binary
     """
-    return f"{bin(0xFFFF & int(str(txt), base=base))[2:]:>016}"
+    return bin(0xFFFF & int(str(txt), base=base))[2:].zfill(size)
 
 
 def first_pass(file: str) -> dict[int, str]:
