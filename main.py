@@ -67,14 +67,8 @@ def process_file(file_path: str, flag: str, sym_table: dict[str, int]) -> None:
                 out_lines.append(f"{bin(LC)[2:]:>012}" + "\t")
                 continue
 
-            elif words[0] == "DEC":
-                inst = str_to_bin(words[1])
-
-            elif words[0] == "HEX":
-                inst = str_to_bin(words[1], 16)
-
             elif words[0].endswith(","):  # if label
-                inst = read_label(sym_table, words, ln)
+                inst = read_inst(words[1:], sym_table, ln)
 
             else:
                 inst = read_inst(words, sym_table, ln)
@@ -86,17 +80,6 @@ def process_file(file_path: str, flag: str, sym_table: dict[str, int]) -> None:
     return out_lines
 
 
-def read_label(sym_table, words, ln):
-    if words[1] == "DEC":
-        inst = str_to_bin(words[2])
-    elif words[1] == "HEX":
-        inst = str_to_bin(words[2], 16)
-    else:
-        inst = read_inst(words[1:], sym_table, ln)
-
-    return inst
-
-
 def read_inst(words: list, table: dict, line_number) -> str:
     """
     Reads and parses an instruction line, returning its binary representation
@@ -106,10 +89,16 @@ def read_inst(words: list, table: dict, line_number) -> str:
             suffix = 8 if len(words) > 2 and words[2] == "I" else 0
             return f"{bin(int(mri[words[0]], base=2) + suffix)[2:]:>04}" + str_to_bin(
                 table[words[1]], 16, 12
-            )
+            )  #
 
         if words[0] in non_mri:
             return str_to_bin(non_mri[words[0]], 16)
+
+        if words[0] == "DEC":
+            return str_to_bin(words[1])
+
+        if words[0] == "HEX":
+            return str_to_bin(words[1], 16)
 
     except Exception as e:
         Exit(f"Invalid Syntax on line {line_number}.\nError: {e}", 4)
