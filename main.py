@@ -42,6 +42,7 @@ def main(args: list[str], current_file: str) -> None:
     with open(output_name, "w") as output:
         out_lines = convert(out_lines, flag)
         output.writelines(out_lines[:-1])
+        print(f"Output saved to '{os.path.abspath(output_name)}'")
 
 
 def process_file(file_path: str, flag: str, sym_table: dict[str, int]) -> None:
