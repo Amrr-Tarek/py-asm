@@ -39,17 +39,17 @@ This will
 
 ## Example Input
 ```bash
-    	ORG 100	/Origin is at memory location 100
-		LDA SUB	/Load 'SUB' into AC
-		CME		/Complement AC
-		INC		/Increment AC
-		ADD MIN	/ADD 'MIN' to AC
-		STA DIF	/Store the result in 'DIF'
-		HLT		/Halt Computer
-MIN,	DEC 83	/Minuend
-SUB,	DEC -23	/Subtrahend
-DIF,	HEX 0	/Result
-		END		/End of symbolic program
+        ORG 100 /Origin is at memory location 100
+        LDA SUB /Load 'SUB' into AC
+        CME     /Complement AC
+        INC     /Increment AC
+        ADD MIN /ADD 'MIN' to AC
+        STA DIF /Store the result in 'DIF'
+        HLT     /Halt Computer
+MIN,    DEC 83  /Minuend
+SUB,    DEC -23 /Subtrahend
+DIF,    HEX 0   /Result
+        END     /End of symbolic program
 ```
 
 ## Example Ouput (using -h flag)
