@@ -52,5 +52,6 @@ def test_file(output_path, correct_path):
 if __name__ == "__main__":
     os.chdir(rf"{os.getcwd()}\testing")
     run_code()
-    test_file(r"output\out1.txt", r"correct\out1.txt")
-    print("===== Test Passed =====")
+    for output, correct in zip(os.listdir("output"), os.listdir("correct")):
+        test_file(rf"output\{output}", rf"correct\{correct}")
+    print(f"===== Test Passed =====")
